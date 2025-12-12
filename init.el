@@ -22,7 +22,7 @@
 (dolist (mode '(term-mode-hook eshell-mode-hook shell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(load-theme 'tango-dark) 
+(load-theme 'tango-dark)
 
 ;; Initialize package sources
 (require 'package)
@@ -125,6 +125,7 @@
   (setq doom-modeline-percent-position '(-3 "%p"))
   (setq doom-modeline-position-column-line-format '("%l:%c"))
   (setq doom-modeline-major-mode-icon t)
+  (setq doom-modeline-height 25)
   )
 
 (use-package rainbow-delimiters
