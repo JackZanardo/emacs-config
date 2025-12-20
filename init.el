@@ -13,7 +13,8 @@
 ;;Enable visible bell rather than audio bell
 (setq visible-bell t)
 
-(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono")
+(set-face-attribute 'default t :font "JetBrainsMono Nerd Font Mono")
+(add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font Mono-11")) ;; Font type & size
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
@@ -155,16 +156,43 @@
 
 (use-package magit)
 
+(use-package format-all)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(company doom-modeline doom-themes flycheck format-all helm magit
+	     move-text projectile rainbow-delimiters)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+  (defun copy-line (arg)
+    "Copy lines (as many as prefix argument) in the kill ring.
+      Ease of use features:
+      - Move to start of next line.
+      - Appends the copy on sequential calls.
+      - Use newline as last char even on the last line of the buffer.
+      - If region is active, copy its lines."
+    (interactive "p")
+    (let ((beg (line-beginning-position))
+          (end (line-end-position arg)))
+      (when mark-active
+        (if (> (point) (mark))
+            (setq beg (save-excursion (goto-char (mark)) (line-beginning-position)))
+          (setq end (save-excursion (goto-char (mark)) (line-end-position)))))
+      (if (eq last-command 'copy-line)
+          (kill-append (buffer-substring beg end) (< end beg))
+        (kill-ring-save beg end)))
+    (kill-append "\n" nil)
+    (beginning-of-line (or (and arg (1+ arg)) 2))
+    (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
+
+(global-set-key "\C-c\C-k" 'copy-line)
+
