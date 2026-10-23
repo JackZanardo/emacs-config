@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Do not ignore the .gitignore file itself (highly recommended)
+!.gitignore
+
+# Do not ignore your specific file
+init.el

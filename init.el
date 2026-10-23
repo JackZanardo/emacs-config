@@ -1,4 +1,4 @@
-
+;;; init.el --- Personal Emacs configuration  -*- lexical-binding: t; -*-
 (setq inhibit-startup-message t)
 
 (scroll-bar-mode -1)
@@ -13,16 +13,19 @@
 ;;Enable visible bell rather than audio bell
 (setq visible-bell t)
 
-(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono")
+(set-face-attribute 'default nil :font "GoMono Nerd Font Mono")
+;; Set the line number type to relative
+(setq-default display-line-numbers-type 'relative)
 
 (column-number-mode)
+;; Enable line numbers globally across all programming and text modes
 (global-display-line-numbers-mode t)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(term-mode-hook eshell-mode-hook shell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(load-theme 'tango-dark) 
+(load-theme 'tango-dark)
 
 ;; Initialize package sources
 (require 'package)
@@ -32,14 +35,14 @@
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 ;; Include manually installed packages
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.config/emacs/lisp/")
 
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
 
 (unless (package-installed-p 'use-package)
-   (package-install 'use-package))
+  (package-install 'use-package))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
@@ -54,48 +57,48 @@
 (use-package helm
   :ensure t
   :config
-    ;; Use C-c h instead of default C-x c, it makes more sense.
-    (global-set-key (kbd "C-c h") 'helm-command-prefix)
-    (global-unset-key (kbd "C-x c"))
+  ;; Use C-c h instead of default C-x c, it makes more sense.
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
 
-    (setq
-     ;; move to end or beginning of source when reaching top or bottom of source.
-     helm-move-to-line-cycle-in-source t
-     ;; search for library in `require' and `declare-function' sexp.
-     helm-ff-search-library-in-sexp t
-     ;; scroll 8 lines other window using M-<next>/M-<prior>
-     helm-scroll-amount 8
-     helm-ff-file-name-history-use-recentf t
-     helm-echo-input-in-header-line t)
+  (setq
+   ;; move to end or beginning of source when reaching top or bottom of source.
+   helm-move-to-line-cycle-in-source t
+   ;; search for library in `require' and `declare-function' sexp.
+   helm-ff-search-library-in-sexp t
+   ;; scroll 8 lines other window using M-<next>/M-<prior>
+   helm-scroll-amount 8
+   helm-ff-file-name-history-use-recentf t
+   helm-echo-input-in-header-line t)
 
-    (global-set-key (kbd "M-x") 'helm-M-x)
-    (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
 
-    (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
-    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
-    (global-set-key (kbd "C-x b") 'helm-mini)
-    (setq helm-buffers-fuzzy-matching t
-          helm-recentf-fuzzy-match t)
+  (global-set-key (kbd "C-x b") 'helm-mini)
+  (setq helm-buffers-fuzzy-matching t
+        helm-recentf-fuzzy-match t)
 
-    ;; TOOD: helm-semantic has not syntax coloring! How can I fix that?
-    (setq helm-semantic-fuzzy-match t
-          helm-imenu-fuzzy-match t)
+  ;; TOOD: helm-semantic has not syntax coloring! How can I fix that?
+  (setq helm-semantic-fuzzy-match t
+        helm-imenu-fuzzy-match t)
 
-    ;; Lists all occurences of a pattern in buffer.
-    (global-set-key (kbd "C-c h o") 'helm-occur)
+  ;; Lists all occurences of a pattern in buffer.
+  (global-set-key (kbd "C-c h o") 'helm-occur)
 
-    (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
+  (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
 
-    ;; open helm buffer inside current window, not occupy whole other window
-    (setq helm-split-window-in-side-p t)
-    (setq helm-autoresize-max-height 50)
-    (setq helm-autoresize-min-height 30)
-    (helm-autoresize-mode 1)
+  ;; open helm buffer inside current window, not occupy whole other window
+  (setq helm-split-window-in-side-p t)
+  (setq helm-autoresize-max-height 50)
+  (setq helm-autoresize-min-height 30)
+  (helm-autoresize-mode 1)
 
-    (helm-mode 1)
-    )
+  (helm-mode 1)
+  )
 
 (use-package doom-themes
   :ensure t
@@ -106,7 +109,7 @@
   ;; for treemacs users
   ;;(doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   :config
-  (load-theme 'doom-tokyo-night t)
+  (load-theme 'doom-solarized-dark-high-contrast t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -157,25 +160,36 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (c-mode . lsp)
+	 (bash-ts-mode . lsp)
+	 (c-mode . lsp)
 	 (c++-mode . lsp)
+	 (csharp-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :config
   (setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      lsp-idle-delay 0.1)  ;; clangd is fast
+	read-process-output-max (* 1024 1024)
+	treemacs-space-between-root-nodes nil
+	company-idle-delay 0.0
+	company-minimum-prefix-length 1
+	lsp-idle-delay 0.1)  ;; clangd is fast
   )
 
+(use-package format-all
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode))
+
+(use-package elisp-autofmt
+  :commands (elisp-autofmt-mode elisp-autofmt-buffer)
+  :hook (emacs-lisp-mode . elisp-autofmt-mode))
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
 ;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol
+  :config
+  (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
 
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
@@ -184,8 +198,8 @@
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 (with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
   (require 'dap-cpptools)
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
   (yas-global-mode))
 
 (use-package projectile)
@@ -193,3 +207,19 @@
 (use-package magit)
 
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(company dap-mode doom-modeline doom-themes elisp-autofmt flycheck
+	     helm helm-lsp lsp-mode lsp-treemacs lsp-ui magit
+	     move-text nerd-icons projectile rainbow-delimiters
+	     yasnippet)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
