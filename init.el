@@ -75,9 +75,9 @@
   (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
 
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x C-g") 'helm-do-grep-ag)
 
   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-
   (global-set-key (kbd "C-x b") 'helm-mini)
   (setq helm-buffers-fuzzy-matching t
         helm-recentf-fuzzy-match t)
@@ -96,7 +96,7 @@
   (setq helm-autoresize-max-height 50)
   (setq helm-autoresize-min-height 30)
   (helm-autoresize-mode 1)
-
+  (setq helm-completion-style 'emacs)
   (helm-mode 1)
   )
 
@@ -172,7 +172,7 @@
 	read-process-output-max (* 1024 1024)
 	treemacs-space-between-root-nodes nil
 	company-idle-delay 0.0
-	company-minimum-prefix-length 1
+        company-minimum-prefix-length 1
 	lsp-idle-delay 0.1)  ;; clangd is fast
   )
 
@@ -193,9 +193,31 @@
 
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
+;; Automatically open the full 6-pane IDE dashboard on M-x gdb
+(setq gdb-many-windows t)
+
+;; Show the source code of the main function immediately upon starting
+(setq gdb-show-main t)
+
 ;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+(use-package dap-mode
+
+  :config
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+  (dap-mode 1)
+
+  ;; The modes below are optional
+
+  (dap-ui-mode 1)
+  ;; enables mouse hover support
+  (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  (tooltip-mode 1)
+  ;; displays floating panel with debug buttons
+  ;; requies emacs 26+
+  (dap-ui-controls-mode 0)
+  )
 
 (with-eval-after-load 'lsp-mode
   (require 'dap-cpptools)
@@ -206,6 +228,15 @@
 
 (use-package magit)
 
+;; `fzf`
+(use-package fzf-native
+  :vc (:url "https://github.com/dangduc/fzf-native" :rev :newest))
+
+(use-package fussy
+  :ensure t
+  :config
+  (fussy-setup-fzf)
+  (fussy-company-setup))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -214,8 +245,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(company dap-mode doom-modeline doom-themes elisp-autofmt flycheck
-	     helm helm-lsp lsp-mode lsp-treemacs lsp-ui magit
-	     move-text nerd-icons projectile rainbow-delimiters
+	     fussy helm helm-ag helm-lsp lsp-mode lsp-treemacs lsp-ui
+	     magit move-text nerd-icons projectile rainbow-delimiters
 	     yasnippet)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
